@@ -8,6 +8,7 @@ import { RegisterDto } from './dto/register.dto';
 import * as bcryptjs from 'bcryptjs';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { IsEmail } from 'class-validator';
 
 @Injectable()
 export class AuthService {
@@ -48,13 +49,21 @@ export class AuthService {
       throw new UnauthorizedException('Invalid password');
     }
 
-    const payload = { email: user.email };
+    const payload = { email: user.email, role: user.role };
 
     const token = await this.jwtService.signAsync(payload);
 
     return {
       token,
-      email: user.email,
+      email,
     };
+  }
+
+  async profile({ email, role }: {email: string, role: string}) {
+   // if( role !== 'admin'){
+   //  throw new UnauthorizedException('You are not authorized to access this resource')
+   // }
+
+   return await this.usersService.findOneByEmail(email);
   }
 }
