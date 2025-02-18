@@ -11,11 +11,10 @@ import {
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { AuthService } from './auth.service';
-import { AuthGuard } from './guard/auth.guard';
-import { Roles } from './decorators/roles.decorator';
-import { RolesGuard } from './guard/roles.guard';
-import { Role } from './enums/role.enum';
+import { Role } from '../common/enums/role.enum';
 import { Auth } from './decorators/auth.decorator';
+import { ActiveUser } from '../common/decorators/active-user.decorator';
+import { ActiveUserInterface } from '../common/interfaces/active-user.interface';
 
 interface RequestWithUser extends Request {
   user: { email: string; role: string };
@@ -36,6 +35,7 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
+  // Autenticación basado en diferentes llamadas de Guards
   // @Get('Profile')
   // @Roles(Role.ADMIN)
   // @UseGuards(AuthGuard, RolesGuard)
@@ -43,12 +43,10 @@ export class AuthController {
   //   return this.authService.profile(req.user);
   // }
 
+  //Autorización de permisos, con un decorator personalizados que realiza todos los Guards
   @Get('profile')
-  @Auth(Role.ADMIN)
-  profile2(
-    @Request()
-    req: RequestWithUser,
-  ) {
-    return req.user;
+  @Auth(Role.USER)
+  profile(@ActiveUser() user: ActiveUserInterface) {
+    return user;
   }
 }
